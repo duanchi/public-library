@@ -5,7 +5,7 @@
  * Date: 14/12/24
  * Time: 下午5:43
  */
-namespace IO;
+namespace Net;
 
 /**
  * Class HTTP

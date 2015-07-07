@@ -9,7 +9,7 @@
 namespace View;
 
 
-interface Api {
+interface View_Abstract {
 
 
     /**

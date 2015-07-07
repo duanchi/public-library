@@ -6,12 +6,12 @@
  * Time: 22:17
  */
 
-namespace CORE;
+namespace Net;
 
 
 class Rpc {
 	protected static $_engine_client    = 'Yar';
-	protected static $_engine_server     = 'Yar';
+	protected static $_engine_server    = 'Yar';
 
 	private static $__client_instance   = [];
 	private static $__server_instance   = [];
