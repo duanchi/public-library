@@ -17,12 +17,13 @@ class View implements \Yaf\View_Interface {
     private $__engine           =   self::VIEW_TYPE_BLITZ;
     private $__config           =   [];
 
-    public function __construct($_template_file, $_conf = NULL, $_spec = NULL) {
+    public function __construct($_template_file, $_config = NULL, $_spec = NULL) {
 
-        $_config                =   \Yaf\Registry::get('config')->get('application')->get('view');
+	    /*foreach($_config as $key => $node)
+		    $_config[$key]      =   $node;*/
+        $_config                =   (array) $_config;
 
-	    foreach($_config as $key => $node)
-		    $_config[$key]      =   $node;
+        t($_config);
 
 	    $_engine                =   constant('self::VIEW_TYPE_' . strtoupper($_config['engine']));
         $_class_name            =   '\\View\\' . $_engine;

@@ -8,7 +8,7 @@
 
 namespace View;
 
-class Blitz extends \Blitz implements View_Abstract
+class Blitz extends \Blitz implements __Abstract
 {
 
     private $__template_file        =   '';
