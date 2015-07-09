@@ -6,6 +6,9 @@
  * Time: 21:57
  */
 
+/**
+ * @param ...$_data
+ */
 function T(...$_data) {
     var_dump(...$_data);
 }
