@@ -19,8 +19,6 @@ class View implements \Yaf\View_Interface {
 
     public function __construct($_template_file, $_config = NULL, $_spec = NULL) {
 
-        t($_config['path']);
-
 	    $_engine                =   constant('self::VIEW_TYPE_' . strtoupper($_config['engine']));
         $_class_name            =   '\\View\\' . $_engine;
 

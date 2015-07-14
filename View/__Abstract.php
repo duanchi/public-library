@@ -9,7 +9,7 @@
 namespace View;
 
 
-interface View_Abstract {
+interface __Abstract {
 
 
     /**
