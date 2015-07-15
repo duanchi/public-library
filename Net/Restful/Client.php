@@ -21,7 +21,8 @@ class Client
 
     }
 
-    public function execute($_request, $_callback_func = NULL) {
+    public function execute($_request, $_callback_func = '') {
 
+        $_callback_func('1',2,$_request);
     }
 }
