@@ -11,19 +11,17 @@ namespace Net\Restful;
 
 class Client
 {
+
+    private $__request_hash     =   [];
+
     function __construct() {
+    }
+
+    public function add_request(Request $_request, $_callback_func = NULL) {
 
     }
 
-    public function add() {
-
-    }
-
-    public function handle() {
-
-    }
-
-    public function get_header() {
+    public function execute($_request, $_callback_func = NULL) {
 
     }
 }

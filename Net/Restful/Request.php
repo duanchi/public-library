@@ -12,10 +12,14 @@ namespace Net\Restful;
 class Request
 {
 
-    protected $_method          =   EX_RESTFUL_METHOD_GET;
+    protected $_method          =   EX_NET_RESTFUL_METHOD_GET;
     protected $_service         =   '';
-    protected $_http_version    =   EX_HTTP_VERSION_1_1;
+    protected $_http_version    =   EX_NET_HTTP_VERSION_1_1;
 
+    protected $_host            =   '';
+    protected $_accept          =   EX_MIMETYPE_MSGPACK;
+    protected $_accept_encoding =   '';
+    protected $_accept_charset  =   EX_CHARSET_UTF8;
     protected $_user_agent      =   '';
     protected $_access_token    =   '';
     protected $_client_id       =   '';
@@ -30,67 +34,53 @@ class Request
         $this->_header          =   new Request\Header();
     }
 
-    public function set($_key, $value = NULL) {
+    public function set($_key, $_value = NULL) {
 
         $_result_value          =   $this;
 
-        if (NULL != $value) {
-            if (0 == count($_key)) {
-                return $_result_value;
-            }
-            $_node              =   $_key;
-        } else {
-            $_node              =   [$_key, $value];
+        $__node                 =   [];
+
+        if (empty($_key)) {
+            return $_result_value;
+        }
+        else if (is_array($_key)) {
+            $__node             =   $_key;
+        }
+        else {
+            $__node             =   [$_key => $_value];
         }
 
-        foreach ($_node as $k => $v) {
-            $lk                 =   strtolower($k);
-            switch($lk) {
+        foreach ($__node as $__k => $__v) {
+            $__header_k         =   '';
+            switch($__k) {
+
                 case 'method':
-
-                    break;
-
                 case 'service':
-
-                    break;
-
                 case 'http_version':
-
+                    $this->{'_'.$__k}     =   $__v;
                     break;
 
+                case 'host':
+                case 'accept':
+                case 'accept_encoding':
+                case 'accept_charset':
                 case 'user_agent':
-                case 'user-agent':
-
-                    break;
-
                 case 'access_token':
-                case 'access-token':
-
-                    break;
-
                 case 'client_id':
-                case 'client-id':
-                    break;
-
                 case 'version':
-
-                    break;
-
                 case 'ranges':
-
+                    $this->{'_'.$__k}     =   $__v;
+                    $this->_header->set($__header_k, $__v);
                     break;
-
+                
                 case 'request_body':
-
+                    $this->_request_body        =   $__v;
                     break;
 
                 default:
-
+                    $this->_header->set($__k, $__v);
                     break;
             }
-
-            set_header:
-
         }
         return $_result_value;
     }
@@ -99,53 +89,42 @@ class Request
 
         $_return_value          =   NULL;
 
-        switch(strtolower($_key)) {
+        switch($_key) {
             case 'method':
-
-                break;
-
             case 'service':
-
-                break;
-
             case 'http_version':
-
-                break;
-
+            case 'host':
+            case 'accept':
+            case 'accept_encoding':
+            case 'accept_charset':
             case 'user_agent':
-            case 'user-agent':
-
-                break;
-
             case 'access_token':
-            case 'access-token':
-
-                break;
-
             case 'client_id':
-            case 'client-id':
-                break;
-
             case 'version':
-
-                break;
-
             case 'ranges':
-
+                $_return_value              =   $this->{'_'.$_key};
                 break;
 
             case 'request_body':
-
+                $_return_value              =   $this->_request_body;
                 break;
 
             default:
-
+                $_return_value              =   $this->_header->get($_key);
                 break;
         }
         return $_return_value;
     }
 
-    public function __set($_key, $_value) {
+    public function set_header($_key, $_value = NULL) {
+        $this->_header->set($_key, $_value);
+    }
+
+    public function get_header($_key) {
+        return $this->_header->get($_key);
+    }
+
+    public function __set($_key, $_value = NULL) {
         return $this->set($_key, $_value);
     }
 

@@ -9,18 +9,44 @@
 namespace Net\Restful\Request;
 class Header
 {
-    protected $_host    =   '';
-    protected $_accept  =   '';
-    protected $_accept_encoding =   '';
-    protected $_accept_charset  =   '';
-    protected $_user_agent      =   '';
-    protected $_access_token    =   '';
-    protected $_client_id       =   '';
-    protected $_version         =   '';
-    protected $_ranges          =   '';
-    protected $_header_list     =   [];
+    protected $_header     =   [];
 
     function __construct() {
 
+    }
+
+    public function set($_key, $_value = NULL) {
+
+        $_result_value          =   $this;
+
+        $__node                 =   [];
+
+        if (empty($_key)) {
+            return $_result_value;
+        }
+
+        else if (is_array($_key)) {
+            foreach ($_key as $__k => $__v) {
+                $this->_header[$__k]=   $__v;
+            }
+        }
+
+        else {
+            $this->_header[$_key]=   $_value;
+        }
+        return $_result_value;
+    }
+
+    public function get($_key) {
+        return (!isset($this->_header[$_key]) ? NULL : $this->_header[$_key]);
+    }
+
+
+    public function __set($_key, $_value = NULL) {
+        return $this->set($_key, $_value);
+    }
+
+    public function __get($_key) {
+        return $this->get($_key);
     }
 }
