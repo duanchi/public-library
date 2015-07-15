@@ -36,8 +36,6 @@ class CONF {
      */
     static public function get ($_scope, $_key = '', $_environment = NULL, $_application = NULL) {
 
-        time();
-
         NULL    ==  $_application   ?   $_application   =   self::$__application    :   FALSE;
         ''      ==  $_key           ?   TRUE                                        :   $_key    =   '.' . $_key;
         NULL    ==  $_environment   ?   $_environment   =   self::$__environment    :   FALSE;
@@ -46,7 +44,9 @@ class CONF {
             return NULL;
         }
 
-        return \Yaconf::get($_application . self::SCOPE_SEPARATOR . $_scope . self::SCOPE_SEPARATOR . $_environment . $_key);
+
+
+        return \Yaconf::get($_application . self::SCOPE_SEPARATOR . $_environment . self::SCOPE_SEPARATOR . $_scope . $_key);
 
     }
 
@@ -68,7 +68,7 @@ class CONF {
             return NULL;
         }
 
-        return \Yaconf::has($_application . self::SCOPE_SEPARATOR . $_scope . self::SCOPE_SEPARATOR . $_environment . $_key);
+        return \Yaconf::has($_application . self::SCOPE_SEPARATOR . $_environment . self::SCOPE_SEPARATOR . $_scope . $_key);
     }
 
     /**
