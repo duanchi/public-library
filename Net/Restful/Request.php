@@ -43,7 +43,7 @@ class Request
         if (empty($_key)) {
             return $_result_value;
         }
-        else if (is_array($_key)) {
+        elseif (is_array($_key)) {
             $__node             =   $_key;
         }
         else {

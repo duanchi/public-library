@@ -21,8 +21,28 @@ class Client
 
     }
 
-    public function execute($_request, $_callback_func = '') {
+    public function execute($_concurrent = 'queue', $_callback_func = '') {
 
-        $_callback_func('1',2,$_request);
+        $_status                =   FALSE;
+        $_response              =   NULL;
+
+
+
+
+
+
+
+
+
+        $this->__callback($_callback_func, $_status, $_response);
+    }
+
+    private function __callback($_callback_func, $_status, $_response) {
+
+        if (empty($_callback_func)) {
+            return FALSE;
+        }
+
+        return $_callback_func($_status, $_response);
     }
 }

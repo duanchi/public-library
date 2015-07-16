@@ -25,7 +25,7 @@ class Header
             return $_result_value;
         }
 
-        else if (is_array($_key)) {
+        elseif (is_array($_key)) {
             foreach ($_key as $__k => $__v) {
                 $this->_header[$__k]=   $__v;
             }
