@@ -21,7 +21,7 @@ class Client
 
     }
 
-    public function execute($_concurrent = 'queue', $_callback_func = '') {
+    public function execute($_exec_type = EX_NET_RESTFUL_REQUEST_CONCURRENT) {
 
         $_status                =   FALSE;
         $_response              =   NULL;
@@ -34,7 +34,7 @@ class Client
 
 
 
-        $this->__callback($_callback_func, $_status, $_response);
+        //$this->__callback($_callback_func, $_status, $_response);
     }
 
     private function __callback($_callback_func, $_status, $_response) {
