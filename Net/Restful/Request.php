@@ -12,6 +12,8 @@ namespace Net\Restful;
 class Request
 {
 
+    const CRLF                  =   "\r\n";
+
     protected $_method          =   EX_NET_RESTFUL_METHOD_GET;
     protected $_service         =   '[SERVICE NOT SET]';
     protected $_resource        =   '';
@@ -153,8 +155,16 @@ class Request
         else {
             $__tmp_parareter_string         =   '';
         }
-        $this->_request_line                =   $this->_method . ' ' . $this->_service . '/' . $this->_resource . $this->_parameter . ' ' . $this->_http_version;
+        $this->_request_line                =   convert_constant('EX_NET_RESTFUL', $this->_method) . ' ' . $this->_service . '/' . $this->_resource . $this->_parameter . ' ' . convert_constant('EX_NET_HTTP_VERSION', $this->_http_version);
 
+        $_return_value                      =   $this->_request_line .
+                                                self::CRLF .
+                                                $this->_request_header .
+                                                (($this->_method >= EX_NET_HTTP_METHOD_POST) ?
+                                                    self::CRLF . $this->_request_body . self::CRLF
+                                                    :
+                                                    ''
+                                                );
         return $_return_value;
     }
 }

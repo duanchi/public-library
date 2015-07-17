@@ -9,7 +9,8 @@
 namespace Net\Restful\Request;
 class Header
 {
-    protected $_header     =   [];
+    const CRLF                  =   "\r\n";
+    protected $_header          =   [];
 
     function __construct() {
 
@@ -27,7 +28,7 @@ class Header
 
         elseif (is_array($_key)) {
             foreach ($_key as $__k => $__v) {
-                $this->_header[$__k]=   $__v;
+                $this->_header[$__k]    =   $__v;
             }
         }
 
@@ -48,5 +49,17 @@ class Header
 
     public function __get($_key) {
         return $this->get($_key);
+    }
+
+    public function __toString() {
+        $_return_value          =   '';
+
+        if (!empty($this->_header)) {
+            foreach($this->_header as $__k => $__v) {
+                $_return_value .=   $__k . ': ' . $__v . self::CRLF;
+            }
+        }
+
+        return rtrim($_return_value, "\r\n");
     }
 }
