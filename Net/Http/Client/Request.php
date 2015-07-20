@@ -12,7 +12,7 @@ namespace Net\Http\Client;
 class Request extends \http\Client\Request
 {
 
-    public function __construct(string $_method = '', string $_url = '', array $_request_headers = [], string $_request_body = '', array $_ssl_options = []) {
+    public function __construct(string $_method = '', string $_url = '', string $_request_body = '', array $_request_headers = [], array $_ssl_options = []) {
         parent::__construct($_method, $_url, $_request_headers);
 
         if ('' != $_request_body) {
