@@ -6,36 +6,51 @@
  * Time: 21:25
  */
 
-namespace Net\Restful;
+namespace Net\Restful\Client;
 
 
 class Request
 {
 
-    const CRLF                  =   "\r\n";
-
     protected $_method          =   EX_NET_RESTFUL_METHOD_GET;
     protected $_service         =   '[SERVICE NOT SET]';
     protected $_resource        =   '';
-    protected $_parameter       =   NULL;
+    protected $_parameters      =   NULL;
     protected $_http_version    =   EX_NET_HTTP_VERSION_1_1;
 
-    protected $_host            =   '';
-    protected $_accept          =   EX_MIMETYPE_MSGPACK;
-    protected $_accept_encoding =   '';
-    protected $_accept_charset  =   EX_CHARSET_UTF8;
-    protected $_user_agent      =   '';
-    protected $_access_token    =   '';
-    protected $_client_id       =   '';
-    protected $_version         =   '';
-    protected $_ranges          =   '';
+    private $__properties       =   [
+        'accept'            =>  ['Accept', EX_MIMETYPE_MSGPACK],
+        'accept_encoding'   =>  ['Accept-Encoding', EX_CHARSET_ENCODING_DEFAULT],
+        'accept_charset'    =>  ['Accept-Charset',  EX_CHARSET_UTF8],
+        'user_agent'        =>  ['User-Agent',  EX_NET_RESTFUL_USERAGENT_DEFAULT],
+        'access_token'      =>  ['Access-Token', NULL],
+        'client_id'         =>  ['Client-Id', NULL],
+        'version'           =>  ['Version', NULL],
+        'ranges'            =>  ['Ranges', NULL]
+    ];
 
-    protected $_request_line    =   '';
-    protected $_request_header  =   NULL;
-    protected $_request_body    =   '';
+    private $__config           =   NULL;
 
-    function __construct() {
-        $this->_request_header  =   new Request\Header();
+    public function __construct(string $_method = '', string $_service = '', $_resource = '', array $_properties = [], string $_request_body = '', array $_ssl_options = []) {
+
+        $this->__config                         =   $this->get_config();
+
+        $this->__init_properties($_properties, $this->__config['properties']);
+
+        !empty($_method) ? $this->_method       =   $_method : FALSE;
+        !empty($_service) ? $this->_service     =   $_service : FALSE;
+        !empty($_resource) ? $this->_resource   =   $_resource : FALSE;
+
+
+        if (!empty($_resource)) {
+            $__url                              =   $this->__update_request_url($_service, $_resource);
+        }
+        else {
+            $__url                              =   $_service;
+        }
+
+
+        parent::__construct($_method, $__url, );
     }
 
     public function set($_key, $_value = NULL) {
@@ -167,4 +182,50 @@ class Request
                                                 );
         return $_return_value;
     }
+
+    private function __get_config() {
+        return \CONF::get('restful', NULL, PUBLIC_LIBRARY_KEY);
+    }
+
+    private function __init_properties($_properties, $_config) {
+
+        if (!empty($_config)) {
+            foreach ($_config as $__k => $__v) {
+                if (isset($__v['key']) and isset($__v['value'])) {
+                    $this->__properties[$__k]   =   [$__v['key'], $__v['value']];
+                }
+                elseif (isset($__v['key'])) {
+                    $this->__properties[$__k]   =   [$__v['key'], NULL];
+                }
+                elseif (is_string($__v)) {
+                    $this->__properties[$__k]   =   [$__v, NULL];
+                }
+            }
+        }
+
+        foreach ($this->__properties as $__k => $__v) {
+            if (isset($_properties[$__k])) {
+                $this->__properties[$__k]       =   $_properties[$__k];
+                $this->set($_properties[$__k][0], $_properties[$__k][1]);
+            }
+            else {
+                $this->set($__v[0], $__v[1]);
+            }
+        }
+    }
+
+    private function __update_request_url($_url, $_resource) {
+
+        $_return_value                          =   '';
+
+        $__has_resource_placeholder             =   0;
+        $_return_value                          =   str_replace($this->__config['resource']['placeholder'], $_resource, $_url, $__has_resource_placeholder);
+
+        if (0 === $__has_resource_placeholder) {
+            $_return_value                      =   rtrim($_url, '/') . $_resource;
+        }
+
+        return $_return_value;
+    }
+
 }

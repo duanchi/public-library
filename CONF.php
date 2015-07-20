@@ -34,7 +34,7 @@ class CONF {
      * @param null $_application
      * @return mixed
      */
-    static public function get ($_scope, $_key = '', $_environment = NULL, $_application = NULL) {
+    public static function get ($_scope, $_key = '', $_environment = NULL, $_application = NULL) {
 
         NULL    ==  $_application   ?   $_application   =   self::$__application    :   FALSE;
         ''      ==  $_key           ?   TRUE                                        :   $_key    =   '.' . $_key;
@@ -45,10 +45,10 @@ class CONF {
         }
 
 
-
         return \Yaconf::get($_application . self::SCOPE_SEPARATOR . $_environment . self::SCOPE_SEPARATOR . $_scope . $_key);
 
     }
+
 
     /**
      * check config if or not exist with scope,key,environment,applications
@@ -58,7 +58,7 @@ class CONF {
      * @param null $_application
      * @return boolean
      */
-    static public function has ($_scope, $_key = '', $_environment = NULL, $_application = NULL) {
+    public static function has ($_scope, $_key = '', $_environment = NULL, $_application = NULL) {
 
         NULL    ==  $_application   ?   $_application   =   self::$__application    :   FALSE;
         ''      ==  $_key           ?   TRUE                                        :   $_key    =   '.' . $_key;

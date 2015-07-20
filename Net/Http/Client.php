@@ -9,13 +9,13 @@ class Client
     private $__request_hash     =   [];
     private $__response_hash    =   [];
 
-    function __construct(array $_configuration  = []) {
+    public function __construct(array $_configuration  = []) {
 
         $_configuration['pipelining']   =   TRUE;
         $this->__instance       =   new \http\Client($_configuration);
     }
 
-    public function add_request(Request $_request, $_callback_func = NULL) {
+    public function add_request(Client\Request $_request, $_callback_func = NULL) {
         $__request_uuid         =   \Core\UUID::make(EX_CORE_UUID_TYPE_RANDOM);
         $this->__request_hash[$__request_uuid]  =   [
             'request'   =>  $_request,
