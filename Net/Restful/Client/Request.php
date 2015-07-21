@@ -35,9 +35,9 @@ class Request extends \Net\Http\Client\Request
 
         $this->__config                         =   $this->__get_config();
 
-        !empty($_method) ? $this->_method       =   $_method : FALSE;
-        !empty($_service) ? $this->_service     =   $_service : FALSE;
-        !empty($_resource) ? $this->_resource   =   $_resource : FALSE;
+        $this->_method                          =   $_method    ??  $this->_method;
+        $this->_service                         =   $_service   ??  $this->_service;
+        $this->_resource                        =   $_resource  ??  $this->_resource;
 
         parent::__construct(
             $_method,
