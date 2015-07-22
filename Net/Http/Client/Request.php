@@ -9,7 +9,7 @@
 namespace Net\Http\Client;
 
 
-class Request extends \http\Client\Request
+class Request
 {
 
     public function __construct(string $_method = '', string $_url = '', string $_request_body = '', array $_request_headers = [], array $_ssl_options = []) {

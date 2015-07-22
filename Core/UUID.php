@@ -12,6 +12,6 @@ namespace Core;
 class UUID
 {
     static public function make($_type = EX_CORE_UUID_TYPE_DEFAULT) {
-        return uuid_create($_type);
+        return uuid_create((int) $_type);
     }
 }
