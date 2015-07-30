@@ -12,104 +12,46 @@ namespace Net\Http\Client;
 class Request
 {
 
-    public function __construct(string $_method = '', string $_url = '', string $_request_body = '', array $_request_headers = [], array $_ssl_options = []) {
-        parent::__construct($_method, $_url, $_request_headers);
+    private $__instance                     =   NULL;
+    private $__configurations               =   [];
 
-        if ('' != $_request_body) {
-            $this->getBody()->append($_request_body);
+    public function __construct(string $_method = EX_NET_HTTP_METHOD_GET, string $_url = '', string $_request_body = '', array $_request_headers = [], array $_configurations = []) {
+
+        $this->__instance                   =   curl_init($_url);
+        $__tmp_configurations               =   [];
+
+        $__tmp_configurations[CURLOPT_CUSTOMREQUEST]    =   $_method;
+
+        if (
+            ($_method == EX_NET_HTTP_METHOD_POST || $_method == EX_NET_HTTP_METHOD_UPDATE || $_method == EX_NET_HTTP_METHOD_PATCH)
+            &&
+            !empty($_request_body)
+        ) {
+            $__tmp_configurations[CURLOPT_POSTFIELDS]   =   $_request_body;
         }
 
-        if (!empty($_ssl_options)) {
-            $this->setSslOptions($_ssl_options);
+        if (!empty($_configurations)) {
+            $__tmp_configurations          +=   $_configurations;
         }
+
+        $this->set($__tmp_configurations);
     }
 
     public function set($_key, $_value = NULL) {
 
-        $_return_value                      =   $this;
+        if (empty($_key)) return FALSE;
 
-        $__node                             =   [];
-
-        if (empty($_key)) {
-            return $_return_value;
-        }
-        elseif (is_array($_key)) {
-            $__node                         =   $_key;
+        if (is_array($_key)) {
+            $this->__configurations        +=   $_key;
         }
         else {
-            $__node                         =   [$_key => $_value];
+            $this->__configurations        +=   [$_key=>$_value];
         }
-
-        foreach ($__node as $__k => $__v) {
-
-            switch($__k) {
-
-                case 'url':
-                    $this->setRequestUrl($__v);
-                    break;
-
-                case 'http_version':
-                    $this->setHttpVersion($__v);
-                    break;
-
-                case 'method':
-                    $this->setRequestMethod($__v);
-                    break;
-
-                case 'request_body':
-                    $this->getBody()->append($__v);
-                    break;
-                case 'ssl_options':
-                    $this->{'_' . $__k}     =   $__v;
-                    break;
-
-                case 'request_header':
-                    if (is_array($__v)) {
-                        $this->setHeaders($__v);
-                    }
-                    break;
-
-                default:
-                    $this->setHeader($__k, $__v);
-
-                    break;
-            }
-        }
-
-        return $_return_value;
+        return TRUE;
     }
 
     public function get($_key) {
-
-        $_return_value                      =   NULL;
-
-        switch($_key) {
-
-            case 'url':
-                $this->getRequestUrl($_key);
-                break;
-
-            case 'http_version':
-                $this->getHttpVersion($_key);
-                break;
-
-            case 'method':
-                $this->getHttpVersion($_key);
-                break;
-
-            case 'request_body':
-                $this->getBody($_key);
-                break;
-
-            case 'request_header':
-                $this->getHeaders();
-                break;
-
-            default:
-                $this->getHeader($_key);
-                break;
-        }
-        return $_return_value;
+        return $this->__configurations[$_key];
     }
 
     public function __set($_key, $_value = NULL) {

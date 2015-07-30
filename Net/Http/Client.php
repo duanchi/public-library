@@ -5,29 +5,38 @@ namespace Net\Http;
 class Client
 {
 
-    private $__instance         =   NULL;
-    private $__request_hash     =   [];
-    private $__response_hash    =   [];
+    private $__instance             =   NULL;
+    private $__request_instances    =   [];
+    private $__response_instances   =   [];
 
     public function __construct(array $_configuration  = []) {
         $_configuration['pipelining']   =   TRUE;
-        $this->__instance       =   new \http\Client();
 
-        if(!empty($_configuration)) {
-            $this->__instance->configure($_configuration);
-        }
+        $this->configure($_configuration);
     }
 
     public function add_request(Client\Request $_request, $_callback_func = NULL) {
         $__request_uuid         =   \Core\UUID::make(EX_CORE_UUID_TYPE_RANDOM);
-        $this->__request_hash[$__request_uuid]  =   [
+        $this->__request_instances[$__request_uuid] =   [
             'request'   =>  $_request,
             'callback'  =>  $_callback_func,
             'status'    =>  EX_HTTP_CLIENT_STATUS_INIT
         ];
-        $this->__response_hash[$__request_uuid] =   NULL;
+        $this->__request_instances[$__request_uuid] =   NULL;
 
         return $this;
+    }
+
+    public function configure($_key, $_value = NULL) {
+        if (empty($_key)) return FALSE;
+
+        if (is_array($_key)) {
+            $this->__configurations        +=   $_key;
+        }
+        else {
+            $this->__configurations        +=   [$_key=>$_value];
+        }
+        return TRUE;
     }
 
     public function execute($_exec_type = EX_NET_HTTP_REQUEST_CONCURRENT) {
