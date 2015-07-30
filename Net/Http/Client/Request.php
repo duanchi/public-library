@@ -37,6 +37,10 @@ class Request
         $this->set($__tmp_configurations);
     }
 
+    public function get_instance() {
+        return $this->__instance;
+    }
+
     public function set($_key, $_value = NULL) {
 
         if (empty($_key)) return FALSE;
