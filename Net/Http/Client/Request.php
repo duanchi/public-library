@@ -13,7 +13,10 @@ class Request
 {
 
     private $__instance                     =   NULL;
-    private $__configurations               =   [];
+    private $__configurations               =   [
+        EX_NET_HTTP_CONF_RETURNHEADER   =>  TRUE,
+        EX_NET_HTTP_CONF_RETURNTRANSFER =>  TRUE
+    ];
 
     public function __construct(string $_method = EX_NET_HTTP_METHOD_GET, string $_url = '', string $_request_body = '', array $_request_headers = [], array $_configurations = []) {
 
@@ -54,8 +57,8 @@ class Request
         return TRUE;
     }
 
-    public function get($_key) {
-        return $this->__configurations[$_key];
+    public function get($_key = NULL) {
+        return (NULL == $_key ? $this->__configurations : $this->__configurations[$_key]);
     }
 
     public function __set($_key, $_value = NULL) {

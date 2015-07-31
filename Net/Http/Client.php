@@ -8,10 +8,12 @@ class Client
     private $__instance                 =   NULL;
     private $__request_instances        =   [];
     private $__response_instances       =   [];
+    private $__configurations           =   [
+        EX_NET_HTTP_CONF_PIPELINING     =>  TRUE,
+        EX_NET_HTTP_CONF_MAXCONNECTS    =>  10
+    ];
 
     public function __construct(array $_configuration  = []) {
-        $_configuration['pipelining']   =   TRUE;
-
         $this->configure($_configuration);
     }
 
@@ -22,7 +24,6 @@ class Client
             'callback'  =>  $_callback_func,
             'status'    =>  EX_HTTP_CLIENT_STATUS_INIT
         ];
-        $this->__request_instances[$__request_uuid] =   NULL;
 
         return $this;
     }
@@ -49,12 +50,12 @@ class Client
             foreach ( $this->__request_instances as $__request_k  => $__request_v) {
                 if ($__request_v['status'] == EX_HTTP_CLIENT_STATUS_INIT) {
 
+                    curl_setopt_array($__request_v['request']->get_instance(), $__request_v['request']->get());
+
                     $__request_v['status']  =   EX_HTTP_CLIENT_STATUS_EXEC;
+                    $__return_value[$__request_k]                       =   $this->__get_response($this->__request_instances[$__request_k]['request']->get_instance(), $_multi_request = FALSE);
 
-                    curl_exec($__request_v->get_instance());
-                    $__return_value[$__request_k]                       =   $this->__get_response($__request_v->get_instance());
-
-                    $__request_v['status']  =   EX_HTTP_CLIENT_STATUS_RESPONED;
+                    $__request_v['status']  =   EX_HTTP_CLIENT_STATUS_RESPONDED;
                 }
             }
 
@@ -66,9 +67,12 @@ class Client
 
             foreach ($this->__request_instances as $__request_k => $__request_v) {
                 if ($__request_v['status'] == EX_HTTP_CLIENT_STATUS_INIT) {
-                    curl_multi_add_handle($__instance, $__request_v->get_instance());
+
+                    curl_setopt_array($__request_v['request']->get_instance(), $__request_v['request']->get());
+                    curl_multi_add_handle($__instance, $__request_v['request']->get_instance());
                     $__tmp_request_hash[]                               =   $__request_k;
                     $this->__request_instances[$__request_k]['status']  = EX_HTTP_CLIENT_STATUS_EXEC;
+
                 }
             }
 
@@ -90,21 +94,23 @@ class Client
 
             while ($__tmp_hash = array_pop($__tmp_request_hash)) {
 
-                $this->__request_instances[$__tmp_hash]['status']       =   EX_HTTP_CLIENT_STATUS_RESPONED;
-                $__return_value[$__tmp_hash]                            =   $this->__get_response($this->__request_instances[$__tmp_hash]['request']->get_instance());
+                $this->__request_instances[$__tmp_hash]['status']       =   EX_HTTP_CLIENT_STATUS_RESPONDED;
+                $__return_value[$__tmp_hash]                            =   $this->__get_response($this->__request_instances[$__tmp_hash]['request']->get_instance(), $_multi_request = TRUE);
                 curl_multi_remove_handle($__instance, $this->__request_instances[$__tmp_hash]['request']->get_instance());
 
                 /* {{{ EXEC CALLBACK FUNCTION START */
-                try {
-                    $this->__request_instances[$__tmp_hash]['callback'](
-                        $__tmp_hash,
-                        $__return_value[$__tmp_hash]['status'],
-                        $this->__request_instances[$__tmp_hash]['request'],
-                        $__return_value[$__tmp_hash]
-                    );
-                    $__return_value[$__tmp_hash]['callback_status']     =   TRUE;
-                } catch (\Exception $_e) {
-                    $__return_value[$__tmp_hash]['callback_status']     =   FALSE;
+                if (!empty($this->__request_instances[$__tmp_hash]['callback'])){
+                    try {
+                        $this->__request_instances[$__tmp_hash]['callback'](
+                            $__tmp_hash,
+                            $__return_value[$__tmp_hash]['status'],
+                            $this->__request_instances[$__tmp_hash]['request'],
+                            $__return_value[$__tmp_hash]
+                        );
+                        $__return_value[$__tmp_hash]['callback_status']     =   TRUE;
+                    } catch (\Exception $_e) {
+                        $__return_value[$__tmp_hash]['callback_status']     =   FALSE;
+                    }
                 }
                 /* EXEC CALLBACK FUNCTION END }}} */
             }
@@ -118,38 +124,71 @@ class Client
         return $__return_value;
     }
 
-    private function __get_response($_handle) {
+    private function __get_response($_handle, $_multi_request = FALSE) {
 
         $__return_value                     =   [
             'status'        =>  -1,
             'message'       =>  '',
             'info'          =>  [],
-            'response'      =>  '',
             'error_code'    =>  -1,
             'error_message' =>  'No Curl Handle Executed.'
         ];
 
+        $__tmp_response                     =   '';
+
+        if (empty($_handle)) {
+            return $__return_value;
+        }
+
+        if (!$_multi_request) {
+            $__tmp_response                 =   curl_exec($_handle);
+        }
+
         $__error_code                       =   curl_errno($_handle);
 
-        if (!empty($_handle) && 0 == $__error_code) {
+        if (0 == $__error_code) {
 
             $__return_value['info']         =   curl_getinfo($_handle);
-            $__return_value['status']       =   $__return_value['http_code'];
-            $__return_value['message']      =   (defined('EX_NET_HTTP_CODE_' . $__return_value['status']) ? get_defined_constants('EX_NET_HTTP_CODE_' . $__return_value['status']) : '');
-            $__return_value['response']     =   curl_multi_getcontent($_handle);
+            $__return_value['status']       =   $__return_value['info']['http_code'];
+            $__return_value['message']      =   (defined('EX_NET_HTTP_CODE_' . $__return_value['status']) ? constant('EX_NET_HTTP_CODE_' . $__return_value['status']) : '');
+            if ($_multi_request) {
+                $__tmp_response             = curl_multi_getcontent($_handle);
+            }
 
+            unset($__return_value['error_code']);
+            unset($__return_value['error_message']);
         }
-        elseif (!empty($_handle) && $__error_code) {
+        else {
 
             $__return_value['error_code']   =   $__error_code;
             $__return_value['error_message']=   curl_error($_handle);
 
         }
 
+        $__return_value                    +=   $this->__parse_response($__tmp_response);
+
         return $__return_value;
     }
 
-    public function __call($_method_name, $_arguments) {
-        return $this->__instance->{$_method_name}(...$_arguments);
+    private function __parse_response($_response) {
+
+        $__return_value                     =   [
+            'header'    =>  [],
+            'response'  =>  ''
+        ];
+
+        $__tmp_response                     =   explode("\r\n\r\n", $_response, 2);
+        $__tmp_header                       =   explode("\r\n",$__tmp_response[0]);
+        $__i                                =   0;
+
+        while(isset($__tmp_header[++$__i])) {
+
+            list($__key, $__value)          =   explode(':', $__tmp_header[$__i], 2);
+            $__return_value['header'][trim($__key)]   =   trim($__value);
+        }
+
+        $__return_value['response']         =   $__tmp_response[1];
+
+        return $__return_value;
     }
 }
