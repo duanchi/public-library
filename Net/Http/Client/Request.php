@@ -58,7 +58,11 @@ class Request
     }
 
     public function get($_key = NULL) {
-        return (NULL == $_key ? $this->__configurations : $this->__configurations[$_key]);
+        return (NULL == $_key ?
+                    $this->__configurations
+                    :
+                    (isset($this->__configurations[$_key]) ? $this->__configurations[$_key] : FALSE)
+                );
     }
 
     public function __set($_key, $_value = NULL) {

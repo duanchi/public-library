@@ -53,7 +53,7 @@ class Client
                     curl_setopt_array($__request_v['request']->get_instance(), $__request_v['request']->get());
 
                     $__request_v['status']  =   EX_HTTP_CLIENT_STATUS_EXEC;
-                    $__return_value[$__request_k]                       =   $this->__get_response($this->__request_instances[$__request_k]['request']->get_instance(), $_multi_request = FALSE);
+                    $__return_value[$__request_k]                       =   $this->__get_response($this->__request_instances[$__request_k]['request']->get_instance(), $_multi_request = FALSE, $__request_v['request']->get(EX_NET_HTTP_CONF_RETURNHEADER));
 
                     $__request_v['status']  =   EX_HTTP_CLIENT_STATUS_RESPONDED;
                 }
@@ -124,7 +124,7 @@ class Client
         return $__return_value;
     }
 
-    private function __get_response($_handle, $_multi_request = FALSE) {
+    private function __get_response($_handle, $_multi_request = FALSE, $_return_header = TRUE) {
 
         $__return_value                     =   [
             'status'        =>  -1,
@@ -165,7 +165,12 @@ class Client
 
         }
 
-        $__return_value                    +=   $this->__parse_response($__tmp_response);
+        if ($_return_header) {
+            $__return_value                    +=   $this->__parse_response($__tmp_response);
+        }
+        else {
+            $__return_value['response']     =   $__tmp_response;
+        }
 
         return $__return_value;
     }
