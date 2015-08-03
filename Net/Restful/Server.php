@@ -11,5 +11,15 @@ namespace Net\Restful;
 
 class Server
 {
+    function __construct() {
 
+    }
+
+    public function add_service($_method = [], string $_service = '') {
+
+    }
+
+    public function handle() {
+
+    }
 }

@@ -20,22 +20,31 @@ class Request
 
     public function __construct(string $_method = EX_NET_HTTP_METHOD_GET, string $_url = '', string $_request_body = '', array $_request_headers = [], array $_configurations = []) {
 
-        $this->__instance                   =   curl_init($_url);
-        $__tmp_configurations               =   [];
+        $this->__instance                                   =   curl_init($_url);
+        $__tmp_configurations                               =   [];
 
-        $__tmp_configurations[CURLOPT_CUSTOMREQUEST]    =   $_method;
+        $__tmp_configurations[CURLOPT_CUSTOMREQUEST]        =   $_method;
 
         if (
             ($_method == EX_NET_HTTP_METHOD_POST || $_method == EX_NET_HTTP_METHOD_UPDATE || $_method == EX_NET_HTTP_METHOD_PATCH)
             &&
             !empty($_request_body)
         ) {
-            $__tmp_configurations[CURLOPT_POSTFIELDS]   =   $_request_body;
+            $__tmp_configurations[CURLOPT_POSTFIELDS]       =   $_request_body;
+        }
+
+        if (!empty($_request_headers)) {
+            isset($__tmp_configurations[EX_NET_HTTP_CONF_HEADER])
+            ?
+            $__tmp_configurations[EX_NET_HTTP_CONF_HEADER] +=  $_request_headers
+            :
+            $__tmp_configurations[EX_NET_HTTP_CONF_HEADER]  =  $_request_headers;
         }
 
         if (!empty($_configurations)) {
-            $__tmp_configurations          +=   $_configurations;
+            $__tmp_configurations                          +=   $_configurations;
         }
+
 
         $this->set($__tmp_configurations);
     }
@@ -61,7 +70,7 @@ class Request
         return (NULL == $_key ?
                     $this->__configurations
                     :
-                    (isset($this->__configurations[$_key]) ? $this->__configurations[$_key] : FALSE)
+                    (isset($this->__configurations[$_key]) ? $this->__configurations[$_key] : NULL)
                 );
     }
 
