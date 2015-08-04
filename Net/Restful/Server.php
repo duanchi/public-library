@@ -11,6 +11,9 @@ namespace Net\Restful;
 
 class Server
 {
+
+    private $__service_instances            =   [];
+
     function __construct() {
 
     }
