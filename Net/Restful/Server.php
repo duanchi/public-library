@@ -18,7 +18,7 @@ class Server
 
     }
 
-    public function add_service($_method = [], string $_service = '') {
+    public function add_service(Object $_object) {
 
     }
 

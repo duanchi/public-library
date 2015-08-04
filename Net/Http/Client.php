@@ -9,8 +9,8 @@ class Client
     private $__request_instances        =   [];
     private $__response_instances       =   [];
     private $__configurations           =   [
-        EX_NET_HTTP_CONF_PIPELINING     =>  TRUE,
-        EX_NET_HTTP_CONF_MAXCONNECTS    =>  10
+        EX_NET_HTTP_OPT_PIPELINING      =>  TRUE,
+        EX_NET_HTTP_OPT_MAXCONNECTS     =>  10
     ];
 
     public function __construct(array $_configuration  = []) {
@@ -53,7 +53,7 @@ class Client
                     curl_setopt_array($__request_v['request']->get_instance(), $__request_v['request']->get());
 
                     $__request_v['status']  =   EX_HTTP_CLIENT_STATUS_EXEC;
-                    $__return_value[$__request_k]                       =   $this->__get_response($this->__request_instances[$__request_k]['request']->get_instance(), $_multi_request = FALSE, $__request_v['request']->get(EX_NET_HTTP_CONF_RETURNHEADER));
+                    $__return_value[$__request_k]                       =   $this->__get_response($this->__request_instances[$__request_k]['request']->get_instance(), $_multi_request = FALSE, $__request_v['request']->get(EX_NET_HTTP_OPT_RETURNHEADER));
 
                     $__request_v['status']  =   EX_HTTP_CLIENT_STATUS_RESPONDED;
                 }

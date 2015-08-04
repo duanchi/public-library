@@ -14,8 +14,8 @@ class Request
 
     private $__instance                     =   NULL;
     private $__configurations               =   [
-        EX_NET_HTTP_CONF_RETURNHEADER   =>  TRUE,
-        EX_NET_HTTP_CONF_RETURNTRANSFER =>  TRUE
+        EX_NET_HTTP_OPT_RETURNHEADER    =>  TRUE,
+        EX_NET_HTTP_OPT_RETURNTRANSFER  =>  TRUE
     ];
 
     public function __construct(string $_method = EX_NET_HTTP_METHOD_GET, string $_url = '', string $_request_body = '', array $_request_headers = [], array $_configurations = []) {
@@ -34,11 +34,11 @@ class Request
         }
 
         if (!empty($_request_headers)) {
-            isset($__tmp_configurations[EX_NET_HTTP_CONF_HEADER])
+            isset($__tmp_configurations[EX_NET_HTTP_OPT_HEADER])
             ?
-            $__tmp_configurations[EX_NET_HTTP_CONF_HEADER] +=  $_request_headers
+            $__tmp_configurations[EX_NET_HTTP_OPT_HEADER]  +=  $_request_headers
             :
-            $__tmp_configurations[EX_NET_HTTP_CONF_HEADER]  =  $_request_headers;
+            $__tmp_configurations[EX_NET_HTTP_OPT_HEADER]   =  $_request_headers;
         }
 
         if (!empty($_configurations)) {
