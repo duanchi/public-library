@@ -12,17 +12,17 @@ namespace Net\Restful;
 class Server
 {
 
-    private $__service_instances            =   [];
+    private $__service_instance             =   NULL;
 
-    function __construct() {
-
+    function __construct(Server\Handler $_object) {
+        $this->add_service($_object);
     }
 
-    public function add_service(Object $_object) {
-
+    public function add_service(Server\Handler $_object) {
+        $this->__service_instance           =   $_object;
     }
 
     public function handle() {
-
+        $this->__service_instance->handle();
     }
 }
