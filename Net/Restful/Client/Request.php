@@ -7,9 +7,9 @@ class Request extends \Net\Http\Client\Request
 
     private $__config           =   [];
 
-    public function __construct(string $_method = EX_NET_RESTFUL_METHOD_GET, string $_service = '[SERVICE NOT SET]', $_resource = '', $_parameter = '', array $_properties = [], array $_request_headers = [], string $_request_body = '', array $_configurations = []) {
+    public function __construct(string $_method = EX_NET_RESTFUL_METHOD_GET, string $_service = '[SERVICE NOT SET]', $_resource = '', $_parameter = '', array $_properties = [], array $_request_headers = [], string $_request_body = '', array $_configurations = [], $_config = []) {
 
-        $this->__config                         =   $this->__get_config();
+        $this->__config                         =   $_config['request'];
 
         parent::__construct(
             $_method,
@@ -21,10 +21,6 @@ class Request extends \Net\Http\Client\Request
             ),
             $_configurations
         );
-    }
-
-    private function __get_config() {
-        return \CONF::get('restful', NULL, NULL, PUBLIC_LIBRARY_KEY);
     }
 
     private function __parse_properties($_properties, $_config) {

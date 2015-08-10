@@ -15,6 +15,8 @@ class Server
     private $__service_instance             =   NULL;
     private $__config                       =   [];
 
+    private $__response                     =   NULL;
+
     private $__request                      =   [
         'method'        =>  EX_NET_RESTFUL_METHOD_GET,
         'url'           =>  '',
@@ -26,26 +28,26 @@ class Server
         'body'          =>  ''
     ];
 
-    function __construct(Server\Handler $_object, $_config) {
+    function __construct(Server\Handle $_object, $_config) {
         $this->__config                     =   $_config;
         $this->add_service($_object);
-        t($_config);
     }
 
-    public function add_service(Server\Handler $_object) {
+    public function add_service(Server\Handle $_object) {
         $this->__service_instance           =   $_object;
     }
 
     public function handle() {
 
-        t($this->__config);
+        $__return_value                     =   NULL;
         $__tmp_instance                     =   $this->__service_instance;
+        $__tmp_request                      =   $this->__request;
 
         $__tmp_url                          =   $__tmp_instance->__url ?? $_SERVER['REQUEST_URI'];
         $__tmp_service                      =   explode('?', $__tmp_url, 2);
-        $__tmp_hdr_pty                      =   $this->__parse_header_and_properties($_SERVER, $this->__config['properties']);
+        $__tmp_hdr_pty                      =   $this->__parse_header_and_properties($_SERVER, $this->__config['request']['properties']);
 
-        /*$this->__request                    =   [
+        $__tmp_request                      =   [
             'method'        =>  $_SERVER['REQUEST_METHOD'],
             'url'           =>  $__tmp_url,
             'service'       =>  $__tmp_service[0] ?? '',
@@ -56,17 +58,29 @@ class Server
             'body'          =>  file_get_contents('php://input')
         ];
 
-        $this->__request['resource']        =   (empty($this->__serviceholder) ? '' : $this->__parse_resource($__tmp_instance->__serviceholder, $__tmp_instance->__resource_locate, $this->__request));*/
+        $__tmp_request['resource']          =   (empty($__tmp_instance->__serviceholder) ? '' : $this->__parse_resource($__tmp_instance->__serviceholder, $__tmp_instance->__resource_locate, $__tmp_request));
 
-        //$__tmp_instance->handle($this->__request);
+        $this->__request                    =   $__tmp_request;
+
+        switch($__tmp_request['method']) {
+            case EX_NET_RESTFUL_METHOD_GET:     $__return_value =   $__tmp_instance->GET    ($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties']);    break;
+            case EX_NET_RESTFUL_METHOD_DELETE:  $__return_value =   $__tmp_instance->DELETE ($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties']);    break;
+            case EX_NET_RESTFUL_METHOD_HEAD:    $__return_value =   $__tmp_instance->HEAD   ($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties']);    break;
+            case EX_NET_RESTFUL_METHOD_TRACE:   $__return_value =   $__tmp_instance->TRACE  ($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties']);    break;
+            case EX_NET_RESTFUL_METHOD_OPTIONS: $__return_value =   $__tmp_instance->OPTIONS($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties']);    break;
+            case EX_NET_RESTFUL_METHOD_POST:    $__return_value =   $__tmp_instance->POST   ($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties'], $__tmp_request['body']);    break;
+            case EX_NET_RESTFUL_METHOD_PUT:     $__return_value =   $__tmp_instance->PUT    ($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties'], $__tmp_request['body']);    break;
+            case EX_NET_RESTFUL_METHOD_PATCH:   $__return_value =   $__tmp_instance->PATCH  ($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties'], $__tmp_request['body']);    break;
+            case EX_NET_RESTFUL_METHOD_UPDATE:  $__return_value =   $__tmp_instance->UPDATE ($__tmp_request['service'], $__tmp_request['resource'], $__tmp_request['parameters'], $__tmp_request['properties'], $__tmp_request['body']);    break;
+            default:
+                break;
+        }
+
+        if (FALSE !== $__return_value) $this->__respond($this->__response);
     }
 
     public function get_request() {
         return $this->__request;
-    }
-
-    private function __get_config() {
-        return \CONF::get('restful', NULL, NULL, PUBLIC_LIBRARY_KEY);
     }
 
     private function __parse_header_and_properties($_source, $_properties_config) {
@@ -75,7 +89,6 @@ class Server
             'headers'       =>  []
         ];
 
-        t($_properties_config);
         /* {{{ PARSE HEADER START */
         foreach ($_source as $_server_k => $_server_v) {
 
@@ -110,18 +123,17 @@ class Server
             }
         }
 
-        /*foreach ($_properties_config as $__property_k => $__property_v) {
+        foreach ($_properties_config as $__property_k => $__property_v) {
             if (!is_array($__property_v)){
                 $__return_value['properties'][$__property_k]    =   [
                     'key'   =>  $__property_v,
                     'value' =>  ''
                 ];
             }
-        }*/
+        }
 
         /* PARSE HEADER END }}} */
 
-        //t($_properties_config);
         return $__return_value;
     }
 
@@ -170,4 +182,71 @@ class Server
 
         return $__return_value;
     }
+
+    private function __respond(Server\Response $_response) {
+
+        $__tmp_http_version                     =   '';
+        $__tmp_properties                       =   $this->__config['response']['properties'];
+        $__tmp_headers                          =   $_response->headers;
+        $__header                               =   '';
+        $__response_body                        =   '';
+
+        switch($_response->http_version) {
+            case EX_NET_HTTP_VERSION_1_0:   $__tmp_http_version =   'HTTP/1.0'; break;
+            case EX_NET_HTTP_VERSION_2_0:   $__tmp_http_version =   'HTTP/2.0'; break;
+            case EX_NET_HTTP_VERSION_1_1:
+            default:
+                $__tmp_http_version =   'HTTP/1.1';
+                break;
+        }
+        header($__tmp_http_version . ' ' . $_response->status . ' ' . $_response->message);
+
+
+        if (!empty($__tmp_headers)) {
+            foreach ($__tmp_headers as $__header) {
+                header($__header);
+            }
+        }
+
+
+        if (!empty($__tmp_properties)) {
+            foreach ($__tmp_properties as $_k => $_v) {
+                if (isset($_response->properties[$_k])) {
+                    $__header                   =   $_response->properties[$_k]['key'] . ': ' . $_response->properties[$_k]['value'];
+                }
+                elseif (is_array($_v)) {
+                    $__header                   =   $_v['key'] . ': ' . ($_v['value'] ?? '');
+                }
+                else {
+                    $__header                   =   $_v . ': ';
+                }
+                header($__header);
+            }
+        }
+
+        if (!empty($_response->content_type)) {
+            header('Content-Type: ' . $_response->content_type);
+        }
+
+        if (!empty($_response->data)) {
+            switch ($_response->content_type) {
+                case EX_MIMETYPE_JSON:
+                    $__response_body            =   json_encode($_response->data, 0);
+                    break;
+
+                case EX_MIMETYPE_MSGPACK:
+                    $__response_body            =   msgpack_pack($_response->data);
+                    break;
+
+                case EX_MINETYPE_PLAIN:
+                default:
+                $__response_body                =   $_response->data;
+                    break;
+            }
+        }
+
+        echo $__response_body;
+    }
+
+
 }

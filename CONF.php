@@ -46,8 +46,6 @@ class CONF {
 
         $__return_value     =   \Yaconf::get($_application . self::SCOPE_SEPARATOR . $_environment . self::SCOPE_SEPARATOR . $_scope . $_key);
 
-        echo $_application . self::SCOPE_SEPARATOR . $_environment . self::SCOPE_SEPARATOR . $_scope . $_key ."\r\n";
-        var_dump($__return_value);
         return $__return_value;
 
     }
