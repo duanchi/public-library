@@ -17,7 +17,8 @@ class Response
 	private $__headers                      =   [];
 	private $__properties                   =   [];
 	private $__data                         =   NULL;
-	private $__content_type                 =   '';
+	private $__content_type                 =   EX_MINETYPE_PLAIN;
+	private $__charset						=	EX_CHARSET_UTF8;
 
 	function __construct () {
 	}
@@ -31,18 +32,23 @@ class Response
 				break;
 
 			case 'status':
-				$this->__status             =   (defined('EX_NET_HTTP_CODE_' . $_value) ? constant('EX_NET_HTTP_CODE_' . $_value) : '');
-				break;
+				$this->__status             =   $_value;
 
 			case 'message':
-				$this->__message            =   $_value;
+				$this->__message            =   (defined('EX_NET_HTTP_CODE_' . $_value) ? constant('EX_NET_HTTP_CODE_' . $_value) : '');
 				break;
 
 			case 'data':
 				$this->__data               =   $_value;
+				break;
 
 			case 'content_type':
 				$this->__content_type       =   $_value;
+				break;
+
+			case 'charset':
+				$this->__charset			=	$_value;
+				break;
 
 			case 'properties':
 				if (!is_array($_value)) {
@@ -51,6 +57,7 @@ class Response
 				else {
 					$this->__properties     =   $_value;
 				}
+			break;
 
 			case 'headers':
 				$this->__headers            =   (!is_array($_value) ? [$_value] : $_value);

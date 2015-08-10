@@ -15,8 +15,6 @@ class Server
     private $__service_instance             =   NULL;
     private $__config                       =   [];
 
-    private $__response                     =   NULL;
-
     private $__request                      =   [
         'method'        =>  EX_NET_RESTFUL_METHOD_GET,
         'url'           =>  '',
@@ -76,7 +74,7 @@ class Server
                 break;
         }
 
-        if (FALSE !== $__return_value) $this->__respond($this->__response);
+        if (FALSE !== $__return_value) $this->__respond($__tmp_instance->get_response());
     }
 
     public function get_request() {
@@ -189,6 +187,8 @@ class Server
         $__tmp_properties                       =   $this->__config['response']['properties'];
         $__tmp_headers                          =   $_response->headers;
         $__header                               =   '';
+        $__content_type                         =   $_response->content_type;
+        $__response_data                        =   $_response->data;
         $__response_body                        =   '';
 
         switch($_response->http_version) {
@@ -212,7 +212,7 @@ class Server
         if (!empty($__tmp_properties)) {
             foreach ($__tmp_properties as $_k => $_v) {
                 if (isset($_response->properties[$_k])) {
-                    $__header                   =   $_response->properties[$_k]['key'] . ': ' . $_response->properties[$_k]['value'];
+                    $__header                   =   (is_array($_v) ? $_v['key'] : $_v) . ': ' . $_response->properties[$_k];
                 }
                 elseif (is_array($_v)) {
                     $__header                   =   $_v['key'] . ': ' . ($_v['value'] ?? '');
@@ -224,11 +224,12 @@ class Server
             }
         }
 
-        if (!empty($_response->content_type)) {
-            header('Content-Type: ' . $_response->content_type);
+        if (!empty($__content_type)) {
+            header('Content-Type: ' . $__content_type . '; charset=' . $_response->charset);
         }
 
-        if (!empty($_response->data)) {
+        if (!empty($__response_data)) {
+
             switch ($_response->content_type) {
                 case EX_MIMETYPE_JSON:
                     $__response_body            =   json_encode($_response->data, 0);
@@ -243,9 +244,9 @@ class Server
                 $__response_body                =   $_response->data;
                     break;
             }
-        }
 
-        echo $__response_body;
+            echo $__response_body;
+        }
     }
 
 
