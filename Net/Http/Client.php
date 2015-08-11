@@ -12,15 +12,20 @@ class Client
         EX_NET_HTTP_OPT_PIPELINING      =>  TRUE,
         EX_NET_HTTP_OPT_MAXCONNECTS     =>  10
     ];
+    protected $__config                 =   [];
 
-    public function __construct(array $_configuration  = []) {
+    public function __construct(array $_config, array $_configuration  = []) {
+        $this->__config                 =   $_config;
         $this->configure($_configuration);
     }
 
     public function add_request(Client\Request $_request, $_callback_func = NULL) {
         $__request_uuid                 =   \Core\UUID::make(EX_CORE_UUID_TYPE_RANDOM);
+
+
+
         $this->__request_instances[$__request_uuid] =   [
-            'request'   =>  $_request,
+            'request'   =>  $this->_init_request($_request),
             'callback'  =>  $_callback_func,
             'status'    =>  EX_HTTP_CLIENT_STATUS_INIT
         ];
@@ -175,10 +180,10 @@ class Client
         return $__return_value;
     }
 
-    private function __parse_response($_response) {
+    protected function __parse_response($_response) {
 
         $__return_value                     =   [
-            'header'    =>  [],
+            'headers'   =>  [],
             'response'  =>  ''
         ];
 
@@ -189,11 +194,15 @@ class Client
         while(isset($__tmp_header[++$__i])) {
 
             list($__key, $__value)          =   explode(':', $__tmp_header[$__i], 2);
-            $__return_value['header'][trim($__key)]   =   trim($__value);
+            $__return_value['headers'][trim($__key)]  =   trim($__value);
         }
 
         $__return_value['response']         =   $__tmp_response[1];
 
         return $__return_value;
+    }
+
+    protected function _init_request(Client\Request $_request) {
+        return $_request;
     }
 }

@@ -232,7 +232,7 @@ class Server
 
             switch ($_response->content_type) {
                 case EX_MIMETYPE_JSON:
-                    $__response_body            =   json_encode($_response->data, 0);
+                    $__response_body            =   $this->_parse_json($_response->data, $this->__config['response']['content_type']['json'] ?? []);
                     break;
 
                 case EX_MIMETYPE_MSGPACK:
@@ -249,5 +249,7 @@ class Server
         }
     }
 
-
+    protected function _parse_json($_data, $_config) {
+        return json_encode($_data, $_config['options'] ?? 0);
+    }
 }
