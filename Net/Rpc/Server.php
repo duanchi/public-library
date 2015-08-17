@@ -6,7 +6,7 @@
  * Time: 16:00
  */
 
-namespace Core\Rpc\Yar;
+namespace Net\Rpc;
 
 class Server extends \Yar_Server {
 }

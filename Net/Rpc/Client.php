@@ -6,9 +6,8 @@
  * Time: 16:00
  */
 
-namespace Core\Rpc\Yar;
+namespace Net\Rpc;
 
 
 class Client extends \Yar_Client {
-
 }
