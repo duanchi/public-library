@@ -16,7 +16,7 @@ class Load
 	static public function register_autoload($_private_library, $_private_namespace) {
 
 		self::$__private_library                          =   $_private_library;
-		self::$__private_namespace                        =   explode($_private_namespace);
+		self::$__private_namespace                        =   explode(',', $_private_namespace);
 
 		spl_autoload_register(function($_classname) {
 
