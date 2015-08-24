@@ -53,7 +53,22 @@ class Load
 		});
 	}
 
-	static public function import() {
+	static public function import ($file_path) {
 
+		$file_list      =   [];
+
+		$file_path      =   \Yaf\Loader::getInstance()->getLibraryPath(TRUE) . DIRECTORY_SEPARATOR . $file_path;
+
+		if (file_exists($file_path)) {
+			$file_list  =   glob($file_path . DIRECTORY_SEPARATOR . '*.php');
+		}
+
+		$file_path      =   \Yaf\Loader::getInstance()->getLibraryPath(FALSE) . DIRECTORY_SEPARATOR . $file_path;
+
+		if (file_exists($file_path)) {
+			$file_list  =   array_merge($file_list, glob($file_path . DIRECTORY_SEPARATOR . '*.php'));
+		}
+
+		foreach($file_list as $v) \Yaf\Loader::import($v);
 	}
 }
